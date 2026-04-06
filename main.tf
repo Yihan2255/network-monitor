@@ -23,3 +23,50 @@ resource "aws_sns_topic_subscription" "email_alert" {
     endpoint = "yihan2255@gmail.com"
 }
 
+# 3. The "identity card" (The Role Itself) 
+resource "aws_iam_role" "lambda_role" {
+    name = "webstite_monitor_lambda_role"
+
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+            {
+                Action = "sts:AssumeRole"
+                Effect = "Allow"
+                Principal = {
+                    Service = "lambda.amazonaws.com"
+                }
+            }
+        ]
+    })
+}
+
+# 4. The "Permission list" (What the Role is allowed to do)
+resource "aws_iam_role_policy" "lambda_policy" {
+    name = "lambda_monitoring_policy"
+    role = aws_iam_role.lambda_role.id
+
+    policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+            {
+                # Permission to create logs so we can see if it is working
+                Action = [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogsEvents"
+                ]
+                Effect = "Allow"
+                Resource = "arn:aws:logs:*:*:*"
+            },
+            {
+                # Permission to Publish to the SNS topic we made in Step 3
+                Action = "sns:Publish"
+                Effect = "Allow"
+                Resource = aws_sns_topic.website_health_alerts.arn
+            }
+        ]
+    })
+}
+
+
