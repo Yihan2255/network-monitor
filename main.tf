@@ -87,6 +87,7 @@ resource "aws_lambda_function" "site_monitor" {
     environment {
         variables = {
             SNS_TOPIC_ARN = aws_sns_topic.website_health_alerts.arn
+            SITE_URL = var.target_url
         }
     }
 
