@@ -99,6 +99,7 @@ resource "aws_cloudwatch_event_rule" "every_interval" {
     name = "check_website_timer"
     description = "Triggers Lambda based on variable interval"
     schedule_expression = "rate(${var.check_interval} minutes)"
+    state               = "DISABLED" # <--- Add this line! (Options: ENABLED or DISABLED)
 }
 
 # 8. Pointing the Clock at the Lambda (The Target)

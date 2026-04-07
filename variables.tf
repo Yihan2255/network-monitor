@@ -1,7 +1,7 @@
 variable "target_url" {
     description = "The URL of the website we want to monitor"
     type = string
-    default = "https://d3uqxgp6irjnvc.cloudfront.net/index.html"
+    default = "https://this-website-is-definitely-fake-12345.com"
 }
 
 variable "check_interval" {
@@ -10,3 +10,4 @@ variable "check_interval" {
     default = 5
 }
 
+#https://d3uqxgp6irjnvc.cloudfront.net/index.html
