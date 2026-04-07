@@ -80,7 +80,7 @@ data "archive_file" "lambda_zip" {
 resource "aws_lambda_function" "site_monitor" {
     filename = "monitor.zip"
     function_name = "website_health_check"
-    role = "aws_iam_role.lambda_role.arn"
+    role = aws_iam_role.lambda_role.arn
     handler = "monitor.lambda_handler"
     runtime = "python3.9"
 
