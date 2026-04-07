@@ -94,4 +94,28 @@ resource "aws_lambda_function" "site_monitor" {
     source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 }
 
+# 7. The "Alarm Clock" (The Rule)
+resource "aws_cloudwatch_event_rule" "every_interval" {
+    name = "check_website_timer"
+    description = "Triggers Lambda based on variable interval"
+    schedule_expression = "rate(${var.check_interval} minutes)
+}
+
+# 8. Pointing the Clock at the Lambda (The Target)
+resource "aws_cloudwatch_event_target" "check_website_callback" {
+    rule = aws_cloudwatch_event_rule.every_interval.name
+    target_id = "lambda"
+    arn = aws_lambda_function.site_monitor.arn
+}
+
+# 9. Giving Permission (The "Open Door")
+# EventBridge needs explicit permission to "knock on the door" of Lambda
+resource "aws_lambda_permission" "allow_cloudwatch" {
+    statement_id = "AllowExecutionFromCloudWatch"
+    action = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.site_monitor.function_name
+    principal = "events.amazonaws.com"
+    source_arn = aws_cloudwatch_event_rule.every_interval.arn
+}
+
 
