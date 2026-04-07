@@ -69,4 +69,28 @@ resource "aws_iam_role_policy" "lambda_policy" {
     })
 }
 
+# 5. Zip the python code
+data "archive_file" "lambda_zip" {
+    type = "zip"
+    source_file = "monitor.py"
+    output_path = "monitor.zip"
+}
+
+# 6. Create the Lambda Function
+resource "aws_lambda_function" "site_monitor" {
+    filename = "monitor.zip"
+    function_name = "website_health_check"
+    role = "aws_iam_role.lambda_role.arn
+    handler = "monitor.lambda_handler"
+    runtime = "python3.9"
+
+    environment {
+        variables = {
+            SNS_TOPIC_ARN = aws_sns_topic.website_health_alerts.arn
+        }
+    }
+
+    source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+}
+
 
